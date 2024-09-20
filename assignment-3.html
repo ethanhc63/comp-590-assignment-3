@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+  <body>
+    <canvas id="canvas" width="640" 
+		height="480" style="border:1px solid #000;">
+  Your browser does not support the canvas element.</canvas>
+  <h2>Resize and place the circle in the hole!</h2>
+    <h3>"D" key = expand circle </h3>
+    <h3>"S" key = shrink circle </h3>
+    <h3>"Enter" key = place circle </h3>
+	<h3>Move circle with arrow keys </h3>
+
+	
+  <script>
+
+// press the "d" key to expand your circle, press the "s" key to shrink your circle.
+
+var keysdown = {};
+
+window.addEventListener("keydown", function (event) {
+  if (event.defaultPrevented) {
+    return; 
+  }
+  
+  keysdown[event.key] = true;
+
+  event.preventDefault();
+}, true);
+
+window.addEventListener("keyup", function (event) {
+  if (event.defaultPrevented) {
+    return; 
+  }
+  
+  keysdown[event.key] = false;
+
+  event.preventDefault();
+}, true);
+
+window.onload = function() {
+  var canvas = document.getElementById("canvas");
+  var context = canvas.getContext("2d");
+  
+			
+  var ball = {x:canvas.width/2,
+              y:canvas.height/2, 
+			  radius:10, 
+			  fillColor:"green", 
+			  velocity_x:5,
+			  velocity_y:5}; 
+			
+  requestAnimationFrame(mainLoop);
+			
+  function mainLoop() {
+    processInput();
+	update();
+	draw();
+				
+	requestAnimationFrame(mainLoop);
+  }
+  
+  function processInput()
+  {
+    if(keysdown.ArrowLeft) {
+		--ball.velocity_x; 
+	}
+    
+    if(keysdown.ArrowUp){
+		--ball.velocity_y;
+	}
+				
+	if (keysdown.ArrowRight) {
+		++ball.velocity_x;
+	}
+				
+	if (keysdown.ArrowDown) {
+		++ball.velocity_y;
+	}
+    if (keysdown.d){
+      if (ball.radius >= 200){
+        return
+      }
+      ++ball.radius;
+    }
+    if (keysdown.s){
+      if (ball.radius <= 10){
+        return
+      }
+      --ball.radius;
+    }
+    if (keysdown.Enter){
+      ball.velocity_x = 0;
+      ball.velocity_y = 0;
+    }
+    if (keysdown.Shift){
+      ball.velocity_x = 3;
+      ball.velocity_y = 3;
+    }
+  }
+  
+  function update() {
+    ball.x += ball.velocity_x; 
+	ball.y += ball.velocity_y;
+				
+	if (ball.x > canvas.width) {
+      ball.velocity_x *= -1;
+      ball.x = canvas.width;
+	}
+				
+	if (ball.x < 0) {
+      ball.velocity_x *= -1;
+	}
+				
+	if (ball.y > canvas.height) {
+      ball.velocity_y *= -1;
+	}
+				
+	if (ball.y < 0) {
+      ball.velocity_y *= -1;
+	}	
+  
+  }
+  
+  function draw() {	
+    
+	context.clearRect(0, 0, canvas.width, canvas.height);
+    
+    context.fillStyle = "black";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "white";
+    context.arc(250, 250, 90, 0, 2 * Math.PI);
+    context.fill();
+   
+    
+    //draw the ball (notice the ball is always drawn at (0,0), what we change
+    context.save();
+    context.translate(ball.x, ball.y);
+    context.beginPath();
+    context.arc(0, 0, ball.radius, 0, 2 * Math.PI, false);
+    context.fillStyle = ball.fillColor;
+	context.fill();
+	context.lineWidth = 1;
+	context.strokeStyle = ball.strokeColor;
+	context.stroke();
+    context.restore();
+  }
+}
+  </script>
+</body>
+</html>
